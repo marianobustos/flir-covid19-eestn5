@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "335791278836",
+    "project_id": "flircovid",
+    "storage_bucket": "flircovid.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335791278836:android:80b4d1fd55069971286ca1",
+        "android_client_info": {
+          "package_name": "com.example.flircovid19"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "335791278836-dol07i3emhgsvue8t38gatc98mn6vghd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flircovid19",
+            "certificate_hash": "5cf78ca2e09043dafe330c22382c227a39bc5d93"
+          }
+        },
+        {
+          "client_id": "335791278836-3m2b884mkv65il5cntfcv3o2spne10bk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-quhbP_cQIZshycuxCIj0LymMyhnA66s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335791278836-3m2b884mkv65il5cntfcv3o2spne10bk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
