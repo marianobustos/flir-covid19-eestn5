@@ -2,8 +2,13 @@ package com.example.flircovid19;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
+
+import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.vision.CameraSource;
 
@@ -131,6 +136,7 @@ public class GraphicOverlay extends View {
     }
 
     /** Draws the overlay with its associated graphic objects. */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -140,9 +146,18 @@ public class GraphicOverlay extends View {
                 widthScaleFactor = (float) canvas.getWidth() / (float) previewWidth;
                 heightScaleFactor = (float) canvas.getHeight() / (float) previewHeight;
             }
+            float center_x=canvas.getWidth()>>1;
+            float center_y=canvas.getHeight()>>1;
+            float axis_major=300;
+            float axis_menor=200;
+            Paint paint=new Paint();
+            paint.setColor(Color.RED);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(5.0f);
 
+            canvas.drawOval(center_x, center_y, center_x+axis_menor, center_y+axis_major,paint);
             for (Graphic graphic : graphics) {
-                //graphic.draw(canvas);
+                graphic.draw(canvas);
             }
         }
     }

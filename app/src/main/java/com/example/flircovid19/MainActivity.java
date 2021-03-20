@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 
+import com.example.flircovid19.FaceDetection.FaceDetectionProcessor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         if(cameraSource==null){
             cameraSource = new CameraSource(this,graphicOverlay);
         }
+        cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor());
     }
 
 
