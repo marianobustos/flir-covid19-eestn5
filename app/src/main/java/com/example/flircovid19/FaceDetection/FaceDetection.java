@@ -1,5 +1,7 @@
 package com.example.flircovid19.FaceDetection;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -7,10 +9,17 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.flircovid19.ml.FackMaskDetection;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 
-public class FaceDetection {
+import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.support.label.Category;
 
+import java.io.IOException;
+import java.util.List;
+
+public class FaceDetection {
+    public static boolean barbijo=false;
     public static float x_face = 0;
     public static float y_face = 0;
     private static float AXIS_MAJOR = 400;
@@ -42,7 +51,12 @@ public class FaceDetection {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5.0f);
-        if (detected) {
+        if(!barbijo){
+            paint.setColor(Color.RED);
+            paintText.setColor(Color.RED);
+            DrawingText(canvas, "SIN BARBIJO", paintText);
+        }
+        if (detected && barbijo) {
             if (awaitingCount++ > 5) {
                 paint.setColor(Color.parseColor("#8bc34a"));
                 paintText.setColor(Color.parseColor("#8bc34a"));
@@ -91,6 +105,26 @@ public class FaceDetection {
         detected = isEmptyFaceInEllipse && faceIsWidth && facePointIsCenter;
         System.out.println("detected:" + detected);
 
+    }
+
+    public static void BarbijoDetected(Context context, Bitmap image){
+        try {
+            FackMaskDetection model = FackMaskDetection.newInstance(context);
+            TensorImage img = TensorImage.fromBitmap(image);
+            FackMaskDetection.Outputs outputs = model.process(img);
+            List<Category> probabilities = outputs.getProbabilityAsCategoryList();
+            float withmask=0;
+            float witoutmask=0;
+            for(Category probability:probabilities){
+                if(probability.getLabel().equals("with_mask")) withmask=probability.getScore();
+                else witoutmask=probability.getScore();
+            }
+
+            barbijo=withmask>witoutmask;
+            model.close();
+        } catch (IOException e) {
+            // TODO Handle the exception
+        }
     }
 
 }

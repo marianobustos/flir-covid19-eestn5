@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private CameraSource cameraSource = null;
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
-
+    private Context context;
     //FLIR
     private ImageView imgViewFlir;
     private FlirCameraHandler flirCameraHandler;
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        context=this;
         preview = findViewById(R.id.firePreview);
         graphicOverlay = findViewById(R.id.fireFaceOverlay);
 
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         if(cameraSource==null){
             cameraSource = new CameraSource(this,graphicOverlay);
         }
-        cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor());
+        cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor(context));
     }
 
     private void startCameraSource(){

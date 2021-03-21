@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <com.example.flircovid19.CameraSourcePreview
+        android:alpha="1"
         android:id="@+id/firePreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,7 +28,7 @@
     <ImageView
         android:adjustViewBounds="true"
         android:scaleType="fitEnd"
-        android:alpha="0.5"
+        android:alpha="1"
 
         android:id="@+id/imgView_flir"
         android:layout_width="wrap_content"

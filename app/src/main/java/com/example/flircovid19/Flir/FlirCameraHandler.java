@@ -80,8 +80,8 @@ public class FlirCameraHandler {
             //max_point 480x640
             //int x_point= (int) ((x_face*480)/1456);
             //int y_point= (int) ((y_face*640)/1092);
-            int x_point= (int) ((x_face)/2);
-            int y_point= (int) ((y_face)/2);
+            int x_point= 480/2;
+            int y_point= 640/2;
             try {
 
                 thermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
@@ -92,14 +92,14 @@ public class FlirCameraHandler {
             }catch (Exception e){
                 System.out.println("FLIR:"+(int)x_point+"x"+(int)y_point+"ERROR"+e.toString());
             }
-           /* Canvas canvas = new Canvas(flirBitmap);
+            Canvas canvas = new Canvas(flirBitmap);
             Paint paint = new Paint();
             paint.setColor(Color.GREEN);
             paint.setStrokeWidth(20);
             canvas.drawCircle(thermalImage.getImage().width>>1, thermalImage.getImage().height>>1, 25, paint);
             paint.setColor(Color.BLUE);
-            canvas.drawCircle(x_face, y_face, 25, paint);*/
-           // streamDataListener.receiveImages(new FlirFrameDataHolder(flirBitmap, 0.2));
+            canvas.drawCircle(x_face, y_face, 25, paint);
+            streamDataListener.receiveImages(new FlirFrameDataHolder(flirBitmap, 0.2));
 
         }
     };
