@@ -2,6 +2,7 @@ package com.example.flircovid19.Flir;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
@@ -22,7 +23,11 @@ import com.flir.thermalsdk.live.discovery.DiscoveryFactory;
 import com.flir.thermalsdk.live.streaming.ThermalImageStreamListener;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.util.Objects;
+
+import static com.example.flircovid19.FaceDetection.FaceDetection.x_face;
+import static com.example.flircovid19.FaceDetection.FaceDetection.y_face;
 
 public class FlirCameraHandler {
     private static final String TAG = "FlirCameraHandler";
@@ -68,21 +73,33 @@ public class FlirCameraHandler {
         @Override
         public void accept(ThermalImage thermalImage) {
             thermalImage.setPalette(PaletteManager.getDefaultPalettes().get(0));//img filter
-            thermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
             thermalImage.setDistanceUnit(DistanceUnit.METER);
 
             Bitmap flirBitmap = BitmapAndroid.createBitmap(thermalImage.getImage()).getBitMap();
             Bitmap rgb = BitmapAndroid.createBitmap(thermalImage.getFusion().getPhoto()).getBitMap();
+            //max_point 480x640
+            //int x_point= (int) ((x_face*480)/1456);
+            //int y_point= (int) ((y_face*640)/1092);
+            int x_point= (int) ((x_face)/2);
+            int y_point= (int) ((y_face)/2);
+            try {
 
+                thermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
+                double temperature = thermalImage.getValueAt(new Point(x_point,y_point));
 
-            //double temperature= thermalImage.getValueAt(new Point(1050,400));
+                System.out.println("FLIR:"+(int)x_point+"x"+(int)y_point+"TEMPERATURE:"+temperature);
 
-            Canvas canvas = new Canvas(flirBitmap);
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            canvas.drawCircle(500, 400, 25, paint);
-
-
-            streamDataListener.receiveImages(new FlirFrameDataHolder(rgb, 0.2));
+            }catch (Exception e){
+                System.out.println("FLIR:"+(int)x_point+"x"+(int)y_point+"ERROR"+e.toString());
+            }
+           /* Canvas canvas = new Canvas(flirBitmap);
+            Paint paint = new Paint();
+            paint.setColor(Color.GREEN);
+            paint.setStrokeWidth(20);
+            canvas.drawCircle(thermalImage.getImage().width>>1, thermalImage.getImage().height>>1, 25, paint);
+            paint.setColor(Color.BLUE);
+            canvas.drawCircle(x_face, y_face, 25, paint);*/
+           // streamDataListener.receiveImages(new FlirFrameDataHolder(flirBitmap, 0.2));
 
         }
     };

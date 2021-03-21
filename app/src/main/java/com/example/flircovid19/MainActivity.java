@@ -8,15 +8,30 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 
 
 import com.example.flircovid19.FaceDetection.FaceDetectionProcessor;
+import com.example.flircovid19.Flir.DiscoveryStatus;
+import com.example.flircovid19.Flir.FlirCameraHandler;
+import com.example.flircovid19.Flir.FlirFrameDataHolder;
+import com.example.flircovid19.Flir.StreamDataListener;
+import com.flir.thermalsdk.ErrorCode;
+import com.flir.thermalsdk.androidsdk.BuildConfig;
+import com.flir.thermalsdk.androidsdk.ThermalSdkAndroid;
+import com.flir.thermalsdk.live.CommunicationInterface;
+import com.flir.thermalsdk.live.Identity;
+import com.flir.thermalsdk.live.connectivity.ConnectionStatusListener;
+import com.flir.thermalsdk.live.discovery.DiscoveryEventListener;
+import com.flir.thermalsdk.log.ThermalLog;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class MainActivity extends AppCompatActivity {
     //CAMERA
@@ -26,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
 
+    //FLIR
+    private ImageView imgViewFlir;
+    private FlirCameraHandler flirCameraHandler;
+    private LinkedBlockingDeque<FlirFrameDataHolder> frameBuffer = new LinkedBlockingDeque<>(21);
 
 
     @Override
@@ -41,14 +60,19 @@ public class MainActivity extends AppCompatActivity {
         } else {
             getRuntimePermissions();
         }
+        /**flir**/
+        ThermalLog.LogLevel enableLoggingInDebug = BuildConfig.DEBUG ? ThermalLog.LogLevel.DEBUG : ThermalLog.LogLevel.NONE;
+        ThermalSdkAndroid.init(this, enableLoggingInDebug);
+
+        imgViewFlir = findViewById(R.id.imgView_flir);
+        flirCameraHandler = new FlirCameraHandler();
+        discoveryStatus.started();
+        flirCameraHandler.startDicovery(cameraDiscoveryEventListener, discoveryStatus);
+
+
     }
 
-    private void createCameraSource() {
-        if(cameraSource==null){
-            cameraSource = new CameraSource(this,graphicOverlay);
-        }
-        cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor());
-    }
+    /**************************************LIFE CYCLE*************************************/
 
 
     @Override
@@ -71,6 +95,70 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    /**************************************FLIR*************************************/
+
+    private DiscoveryStatus discoveryStatus = new DiscoveryStatus() {
+        @Override
+        public void started() {
+
+        }
+
+        @Override
+        public void stopped() {
+
+        }
+    };
+
+
+    private DiscoveryEventListener cameraDiscoveryEventListener = new DiscoveryEventListener() {
+        @Override
+        public void onCameraFound(Identity identity) {
+            Log.w(TAG, "[cameraDiscoveryEventListener][onCameraFound]:" + identity.toString());
+            flirCameraHandler.connect(identity, connectionStatusListener);
+            flirCameraHandler.startStream(streamDataListener);
+        }
+
+        @Override
+        public void onDiscoveryError(CommunicationInterface communicationInterface, ErrorCode errorCode) {
+            flirCameraHandler.disconnected();
+        }
+    };
+
+    private ConnectionStatusListener connectionStatusListener = new ConnectionStatusListener() {
+        @Override
+        public void onDisconnected(ErrorCode errorCode) {
+            flirCameraHandler.disconnected();
+        }
+    };
+
+    private StreamDataListener streamDataListener = new StreamDataListener() {
+        @Override
+        public void receiveImages(FlirFrameDataHolder dataHolder) {
+            try {
+                frameBuffer.put(dataHolder);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        FlirFrameDataHolder poll = frameBuffer.poll();
+                        imgViewFlir.setImageBitmap(poll.flirMap);
+                    }
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+    };
+    /************************************** Camera *************************************/
+
+    private void createCameraSource() {
+        if(cameraSource==null){
+            cameraSource = new CameraSource(this,graphicOverlay);
+        }
+        cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor());
+    }
 
     private void startCameraSource(){
         if (cameraSource != null) {

@@ -11,14 +11,28 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 
 public class FaceDetection {
 
-
+    public static float x_face = 0;
+    public static float y_face = 0;
     private static float AXIS_MAJOR = 400;
     private static float AXIS_MENOR = 300;
     private static boolean detected = false;
-    private static boolean awaint =false;
-    private static int awaitingCount=0;
-    public static void DrawingTemperature(Canvas canvas) {
+    private static int awaint = 0;
+    private static int awaitingCount = 0;
+    private static Paint paintText = new Paint();
+    private static int color;
 
+
+    public static void DrawingText(Canvas canvas, String text, Paint paint) {
+        paint.setTextSize(50f);
+        paint.setTextAlign(Paint.Align.CENTER);
+
+
+        canvas.drawText(
+                text,
+                (canvas.getWidth() >> 1),
+                (canvas.getHeight() >> 1) + (AXIS_MAJOR + 80) / 2,
+                paint
+        );
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -28,17 +42,23 @@ public class FaceDetection {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5.0f);
-
         if (detected) {
-            paint.setStrokeWidth(10);
-            if(awaitingCount++>3){
-                awaitingCount=0;
+            if (awaitingCount++ > 5) {
+                paint.setColor(Color.parseColor("#8bc34a"));
+                paintText.setColor(Color.parseColor("#8bc34a"));
+                DrawingText(canvas, "Temperatura: 34ºC", paintText);
+            } else{
+                paint.setStrokeWidth(10);
                 paint.setColor(Color.parseColor("#ffc107"));
-            }else paint.setColor(Color.parseColor("#b28704"));
+                paintText.setColor(Color.parseColor("#ffc107"));
+                DrawingText(canvas, "Espere...", paintText);
+            }
 
+        } else{
+             paint.setColor(Color.RED);
+            awaitingCount=0;
 
         }
-        else paint.setColor(Color.RED);
 
         canvas.drawOval(center_x, center_y, center_x + AXIS_MENOR, center_y + AXIS_MAJOR, paint);
     }
@@ -52,9 +72,13 @@ public class FaceDetection {
         //Punto medio de la img
         float center_x = canvas.getWidth() >> 1;
         float center_y = canvas.getHeight() >> 1;
+
         //Punto de la frente
-        double x = face.getBoundingBox().centerX() + 4;
-        double y = face.getBoundingBox().centerY();
+        float x = face.getBoundingBox().centerX() + 4;
+        float y = face.getBoundingBox().centerY();
+
+        x_face = x;
+        y_face = y;
 
         //tolerancia
         double tolerance = 20;
@@ -65,6 +89,7 @@ public class FaceDetection {
         //Verifico si el punto pertenece al elipse
         boolean isEmptyFaceInEllipse = (Math.pow((x - center_x), 2) / AXIS_MENOR) + (Math.pow((y - center_y), 2) / AXIS_MAJOR) <= AXIS_MAJOR;
         detected = isEmptyFaceInEllipse && faceIsWidth && facePointIsCenter;
+        System.out.println("detected:" + detected);
 
     }
 

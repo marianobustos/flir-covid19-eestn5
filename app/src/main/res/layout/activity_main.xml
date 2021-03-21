@@ -24,5 +24,14 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true" />
     </com.example.flircovid19.CameraSourcePreview>
+    <ImageView
+        android:adjustViewBounds="true"
+        android:scaleType="fitEnd"
+        android:alpha="0.5"
 
+        android:id="@+id/imgView_flir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints" />
+    <!--android:rotation="270"-->
 </androidx.constraintlayout.widget.ConstraintLayout>
