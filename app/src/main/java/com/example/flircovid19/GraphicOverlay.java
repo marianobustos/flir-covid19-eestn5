@@ -10,6 +10,7 @@ import android.view.View;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.flircovid19.FaceDetection.FaceDetection;
 import com.google.android.gms.vision.CameraSource;
 
 import java.util.HashSet;
@@ -146,16 +147,7 @@ public class GraphicOverlay extends View {
                 widthScaleFactor = (float) canvas.getWidth() / (float) previewWidth;
                 heightScaleFactor = (float) canvas.getHeight() / (float) previewHeight;
             }
-            float center_x=canvas.getWidth()>>1;
-            float center_y=canvas.getHeight()>>1;
-            float axis_major=300;
-            float axis_menor=200;
-            Paint paint=new Paint();
-            paint.setColor(Color.RED);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(5.0f);
-
-            canvas.drawOval(center_x, center_y, center_x+axis_menor, center_y+axis_major,paint);
+            FaceDetection.DrawingFaceEllipse(canvas);
             for (Graphic graphic : graphics) {
                 graphic.draw(canvas);
             }

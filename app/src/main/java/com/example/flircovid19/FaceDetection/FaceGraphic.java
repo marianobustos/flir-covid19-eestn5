@@ -73,7 +73,7 @@ public class FaceGraphic extends Graphic {
         // Draws a circle at the position of the detected face, with the face's track id below.
         float x = translateX(face.getBoundingBox().centerX());
         float y = translateY(face.getBoundingBox().centerY());
-        // face.getBoundingBox().
+        // face.getBoundingBox().DrawingFaceEllipse
         canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
     /*canvas.drawText("id: " + face.getTrackingId(), x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint);
     canvas.drawText(
@@ -113,10 +113,6 @@ public class FaceGraphic extends Graphic {
         float right = x + xOffset;
         float bottom = y + yOffset;
         canvas.drawRect(left, top, right, bottom, boxPaint);
-        float center_x=canvas.getWidth()>>1;
-        float center_y=canvas.getHeight()>>1;
-        float axis_major=300;
-        float axis_menor=200;
-        canvas.drawOval(center_x, center_y, center_x+axis_menor, center_y+axis_major,boxPaint);
+        FaceDetection.FaceIsDetected(canvas,face);
     }
 }

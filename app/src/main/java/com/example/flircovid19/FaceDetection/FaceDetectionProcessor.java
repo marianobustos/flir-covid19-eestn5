@@ -48,7 +48,7 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
     protected void onSuccess(@NonNull List<FirebaseVisionFace> faces, @NonNull FrameMetadata frameMetadata, @NonNull GraphicOverlay graphicOverlay) {
 
         graphicOverlay.clear();
-        System.out.println("FACE:"+faces.size());
+
         for (int i = 0; i < faces.size(); ++i) {
             FirebaseVisionFace face = faces.get(i);
             FaceGraphic faceGraphic = new FaceGraphic(graphicOverlay);
