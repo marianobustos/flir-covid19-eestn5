@@ -96,5 +96,4 @@
         app:layout_constraintStart_toStartOf="@+id/imgAccessStatus"
         app:layout_constraintTop_toBottomOf="@+id/imgAccessStatus" />
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>
