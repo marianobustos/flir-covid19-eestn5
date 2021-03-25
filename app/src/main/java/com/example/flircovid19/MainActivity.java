@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         ThermalLog.LogLevel enableLoggingInDebug = BuildConfig.DEBUG ? ThermalLog.LogLevel.DEBUG : ThermalLog.LogLevel.NONE;
         ThermalSdkAndroid.init(this, enableLoggingInDebug);
 
-        imgViewFlir = findViewById(R.id.imgView_flir);
+        //imgViewFlir = findViewById(R.id.imgView_flir);
         flirCameraHandler = new FlirCameraHandler();
         discoveryStatus.started();
         flirCameraHandler.startDicovery(cameraDiscoveryEventListener, discoveryStatus);
