@@ -27,7 +27,7 @@
 
     </com.example.flircovid19.CameraSourcePreview>
     <ImageView
-        android:alpha="1"
+        android:alpha="0.5"
         android:id="@+id/imgView_flir"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

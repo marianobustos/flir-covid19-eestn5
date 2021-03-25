@@ -2,8 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.flircovid19">
 
-    <uses-permission android:name="android.permission.CAMERA" />
-    <!--flir-->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- flir -->
     <uses-feature
         android:name="android.hardware.usb.host"
         android:required="true" />
@@ -15,12 +14,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FlirCovid19">
+        <activity android:name=".PreviewActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/flir_usb_device_filter" />

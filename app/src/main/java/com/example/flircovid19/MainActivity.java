@@ -5,8 +5,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.util.Log;
 import android.widget.ImageView;
 
 
+import com.example.flircovid19.FaceDetection.FaceDetection;
 import com.example.flircovid19.FaceDetection.FaceDetectionProcessor;
 import com.example.flircovid19.Flir.DiscoveryStatus;
 import com.example.flircovid19.Flir.FlirCameraHandler;
@@ -33,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import static com.example.flircovid19.FaceDetection.FaceDetection.setBitmapPreview;
+
 public class MainActivity extends AppCompatActivity {
     //CAMERA
     private static final int PERMISSION_REQUESTS = 1;
@@ -46,12 +51,12 @@ public class MainActivity extends AppCompatActivity {
     private FlirCameraHandler flirCameraHandler;
     private LinkedBlockingDeque<FlirFrameDataHolder> frameBuffer = new LinkedBlockingDeque<>(21);
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context=this;
+        context = this;
+        FaceDetection.setContext(this);
         preview = findViewById(R.id.firePreview);
         graphicOverlay = findViewById(R.id.fireFaceOverlay);
 
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             getRuntimePermissions();
         }
+
         /**flir**/
         ThermalLog.LogLevel enableLoggingInDebug = BuildConfig.DEBUG ? ThermalLog.LogLevel.DEBUG : ThermalLog.LogLevel.NONE;
         ThermalSdkAndroid.init(this, enableLoggingInDebug);
@@ -72,13 +78,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FaceDetection.setContext(this);
+    }
+
     /**************************************LIFE CYCLE*************************************/
+
+
 
 
     @Override
     protected void onResume() {
         super.onResume();
         startCameraSource();
+
     }
 
     @Override
@@ -90,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(cameraSource!=null){
+        if (cameraSource != null) {
             cameraSource.release();
         }
     }
@@ -141,7 +156,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         FlirFrameDataHolder poll = frameBuffer.poll();
-                        imgViewFlir.setImageBitmap(poll.flirMap);
+                        setBitmapPreview(poll.flirMap);
+                        //imgViewFlir.setImageBitmap(poll.flirMap);
                     }
                 });
             } catch (InterruptedException e) {
@@ -151,21 +167,22 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
     /************************************** Camera *************************************/
 
     private void createCameraSource() {
-        if(cameraSource==null){
-            cameraSource = new CameraSource(this,graphicOverlay);
+        if (cameraSource == null) {
+            cameraSource = new CameraSource(this, graphicOverlay);
         }
         cameraSource.setMachineLearningFrameProcessor(new FaceDetectionProcessor(context));
     }
 
-    private void startCameraSource(){
+    private void startCameraSource() {
         if (cameraSource != null) {
 
             try {
                 cameraSource.setFacing(CameraSource.CAMERA_FACING_FRONT);
-                preview.start(cameraSource,graphicOverlay);
+                preview.start(cameraSource, graphicOverlay);
 
             } catch (IOException e) {
                 cameraSource.release();
@@ -173,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     /************************************** permisos *************************************/
     private String[] getRequiredPermissions() {
         try {

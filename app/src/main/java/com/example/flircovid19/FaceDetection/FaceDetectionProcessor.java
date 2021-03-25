@@ -1,14 +1,12 @@
 package com.example.flircovid19.FaceDetection;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.example.flircovid19.FrameMetadata;
 import com.example.flircovid19.GraphicOverlay;
 import com.example.flircovid19.VisionProcessorBase;
-import com.example.flircovid19.ml.FackMaskDetection;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
@@ -16,13 +14,8 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 
-import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.support.label.Category;
-
 import java.io.IOException;
 import java.util.List;
-
-import static com.example.flircovid19.FaceDetection.FaceDetection.barbijo;
 
 public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVisionFace>> {
 
@@ -54,7 +47,7 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
                 @Override
                 public void run() {
                     super.run();
-                    FaceDetection.BarbijoDetected(context,image.getBitmap());
+                    FaceDetection.maskDetected(context,image.getBitmap());
                 }
             };
             barbijoThread.start();

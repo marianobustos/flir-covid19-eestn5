@@ -1,6 +1,7 @@
 package com.example.flircovid19.FaceDetection;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,6 +10,8 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.flircovid19.MainActivity;
+import com.example.flircovid19.PreviewActivity;
 import com.example.flircovid19.ml.FackMaskDetection;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 
@@ -19,7 +22,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class FaceDetection {
-    public static boolean barbijo=false;
+    public static float temperature=50;
+    public static boolean hasMask =false;
     public static float x_face = 0;
     public static float y_face = 0;
     private static float AXIS_MAJOR = 400;
@@ -29,8 +33,16 @@ public class FaceDetection {
     private static int awaitingCount = 0;
     private static Paint paintText = new Paint();
     private static int color;
+    private static Context context;
+    public static Bitmap bitmap_preview;
+    private static boolean asd=false;
 
-
+    public static void setContext(Context ctx){
+        context=ctx;
+    }
+    public static void setBitmapPreview(Bitmap bmp){
+        bitmap_preview=bmp;
+    }
     public static void DrawingText(Canvas canvas, String text, Paint paint) {
         paint.setTextSize(50f);
         paint.setTextAlign(Paint.Align.CENTER);
@@ -51,25 +63,29 @@ public class FaceDetection {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5.0f);
-        if(!barbijo){
-            paint.setColor(Color.RED);
-            paintText.setColor(Color.RED);
-            DrawingText(canvas, "SIN BARBIJO", paintText);
-        }
-        if (detected && barbijo) {
+
+        if (detected) {
+
+            paint.setStrokeWidth(10);
+            paint.setColor(Color.parseColor("#ffc107"));
+            paintText.setColor(Color.parseColor("#ffc107"));
+            DrawingText(canvas, "Espere...", paintText);
+
+
             if (awaitingCount++ > 5) {
-                paint.setColor(Color.parseColor("#8bc34a"));
-                paintText.setColor(Color.parseColor("#8bc34a"));
-                DrawingText(canvas, "Temperatura: 34ºC", paintText);
-            } else{
-                paint.setStrokeWidth(10);
-                paint.setColor(Color.parseColor("#ffc107"));
-                paintText.setColor(Color.parseColor("#ffc107"));
-                DrawingText(canvas, "Espere...", paintText);
+                awaitingCount=0;
+                if(context instanceof  MainActivity){
+                    context.startActivity(new Intent(context, PreviewActivity.class));
+                }
+
             }
 
         } else{
-             paint.setColor(Color.RED);
+            paint.setColor(Color.RED);
+            if(!hasMask){
+                paintText.setColor(Color.RED);
+                DrawingText(canvas, "SIN TAPA BOCA", paintText);
+            }
             awaitingCount=0;
 
         }
@@ -107,7 +123,7 @@ public class FaceDetection {
 
     }
 
-    public static void BarbijoDetected(Context context, Bitmap image){
+    public static void maskDetected(Context context, Bitmap image){
         try {
             FackMaskDetection model = FackMaskDetection.newInstance(context);
             TensorImage img = TensorImage.fromBitmap(image);
@@ -120,7 +136,7 @@ public class FaceDetection {
                 else witoutmask=probability.getScore();
             }
 
-            barbijo=withmask>witoutmask;
+            hasMask =withmask>witoutmask;
             model.close();
         } catch (IOException e) {
             // TODO Handle the exception

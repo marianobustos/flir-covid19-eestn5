@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.example.flircovid19.FaceDetection.FaceDetection;
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.DistanceUnit;
 import com.flir.thermalsdk.image.Point;
@@ -86,19 +87,19 @@ public class FlirCameraHandler {
 
                 thermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
                 double temperature = thermalImage.getValueAt(new Point(x_point,y_point));
-
+                FaceDetection.temperature= (float) temperature;
                 System.out.println("FLIR:"+(int)x_point+"x"+(int)y_point+"TEMPERATURE:"+temperature);
 
             }catch (Exception e){
                 System.out.println("FLIR:"+(int)x_point+"x"+(int)y_point+"ERROR"+e.toString());
             }
-            Canvas canvas = new Canvas(flirBitmap);
+            /*Canvas canvas = new Canvas(flirBitmap);
             Paint paint = new Paint();
             paint.setColor(Color.GREEN);
             paint.setStrokeWidth(20);
             canvas.drawCircle(thermalImage.getImage().width>>1, thermalImage.getImage().height>>1, 25, paint);
             paint.setColor(Color.BLUE);
-            canvas.drawCircle(x_face, y_face, 25, paint);
+            canvas.drawCircle(x_face, y_face, 25, paint);*/
             streamDataListener.receiveImages(new FlirFrameDataHolder(flirBitmap, 0.2));
 
         }
