@@ -78,6 +78,7 @@ public class PreviewActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                bitmap_preview=null;
                 finish();
             }
         },seconds*1000);
