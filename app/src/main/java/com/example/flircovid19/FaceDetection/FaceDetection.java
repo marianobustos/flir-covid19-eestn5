@@ -26,8 +26,12 @@ public class FaceDetection {
     public static boolean hasMask =false;
     public static float x_face = 0;
     public static float y_face = 0;
-    private static float AXIS_MAJOR = 400;
-    private static float AXIS_MENOR = 300;
+    public static float AXIS_MAJOR = 400;
+    public static float AXIS_MENOR = 300;
+    public static int DEFAULT_CENTER_X=1445>>1;
+    public static int DEFAULT_CENTER_Y=1092>>1;
+    public static int CENTER_X=0;
+    public static int CENTER_Y=0;
     private static boolean detected = false;
     private static int awaint = 0;
     private static int awaitingCount = 0;
@@ -50,16 +54,16 @@ public class FaceDetection {
 
         canvas.drawText(
                 text,
-                (canvas.getWidth() >> 1),
-                (canvas.getHeight() >> 1) + (AXIS_MAJOR + 80) / 2,
+                (canvas.getWidth() >> 1)+CENTER_X,
+                ((canvas.getHeight() >> 1) + (AXIS_MAJOR + 80) / 2)+CENTER_Y,
                 paint
         );
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void DrawingFaceEllipse(Canvas canvas) {
-        float center_x = (canvas.getWidth() >> 1) - (AXIS_MENOR / 2);
-        float center_y = (canvas.getHeight() >> 1) - (AXIS_MAJOR / 2);
+        float center_x = ((canvas.getWidth() >> 1) - (AXIS_MENOR / 2))+CENTER_X;
+        float center_y = ((canvas.getHeight() >> 1) - (AXIS_MAJOR / 2))+CENTER_Y;
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5.0f);
@@ -100,15 +104,16 @@ public class FaceDetection {
         Paint d = new Paint();
         d.setColor(Color.BLUE);
         //Punto medio de la img
-        float center_x = canvas.getWidth() >> 1;
-        float center_y = canvas.getHeight() >> 1;
+        float center_x = (canvas.getWidth() >> 1)-CENTER_X;
+        float center_y = (canvas.getHeight() >> 1)+CENTER_Y;
 
         //Punto de la frente
-        float x = face.getBoundingBox().centerX() + 4;
+        float x = face.getBoundingBox().centerX() + 4 ;
         float y = face.getBoundingBox().centerY();
 
         x_face = x;
         y_face = y;
+        System.out.println("detected:" + x_face+"x"+y_face+"---->"+center_x+"x"+center_y);
 
         //tolerancia
         double tolerance = 20;
@@ -119,7 +124,6 @@ public class FaceDetection {
         //Verifico si el punto pertenece al elipse
         boolean isEmptyFaceInEllipse = (Math.pow((x - center_x), 2) / AXIS_MENOR) + (Math.pow((y - center_y), 2) / AXIS_MAJOR) <= AXIS_MAJOR;
         detected = isEmptyFaceInEllipse && faceIsWidth && facePointIsCenter;
-        System.out.println("detected:" + detected);
 
     }
 

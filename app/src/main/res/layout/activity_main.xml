@@ -28,6 +28,8 @@
     </com.example.flircovid19.CameraSourcePreview>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:visibility="visible"
+        android:id="@+id/default_layout"
         android:layout_width="300dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -37,7 +39,7 @@
         >
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/bt_debug"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:src="@drawable/logo"
@@ -57,7 +59,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+            app:layout_constraintTop_toBottomOf="@+id/bt_debug" />
 
         <TextView
             android:layout_width="0dp"
@@ -73,4 +75,135 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_debug"
+        android:visibility="invisible"
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/design_default_color_primary"
+        >
+
+        <TextView
+            android:id="@+id/txtEllipseX"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Elipse X:"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/btn_save"
+            app:layout_constraintStart_toStartOf="@+id/btn_save"
+            tools:ignore="MissingConstraints" />
+
+        <SeekBar
+            android:id="@+id/elipse_x"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/txtEllipseX"
+            app:layout_constraintStart_toStartOf="@+id/txtEllipseX"
+            app:layout_constraintTop_toBottomOf="@+id/txtEllipseX" />
+
+        <TextView
+            android:id="@+id/txtEllipseY"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Elipse Y:"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/btn_save"
+            app:layout_constraintStart_toStartOf="@+id/btn_save"
+            app:layout_constraintTop_toBottomOf="@+id/elipse_x"
+            tools:ignore="MissingConstraints" />
+
+        <SeekBar
+            android:id="@+id/elipse_y"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/txtEllipseY"
+            app:layout_constraintStart_toStartOf="@+id/txtEllipseY"
+            app:layout_constraintTop_toBottomOf="@+id/txtEllipseY" />
+
+        <TextView
+            android:layout_marginTop="70dp"
+            android:id="@+id/txtEllipseCenterX"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Elipse centro X:"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/btn_save"
+            app:layout_constraintStart_toStartOf="@+id/btn_save"
+            app:layout_constraintTop_toBottomOf="@+id/elipse_y"
+            tools:ignore="MissingConstraints" />
+
+        <SeekBar
+            android:id="@+id/elipse_center_x"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/txtEllipseCenterX"
+            app:layout_constraintStart_toStartOf="@+id/txtEllipseCenterX"
+            app:layout_constraintTop_toBottomOf="@+id/txtEllipseCenterX" />
+
+        <TextView
+            android:id="@+id/txtEllipseCenterY"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Elipse centro Y:"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/btn_save"
+            app:layout_constraintStart_toStartOf="@+id/btn_save"
+            app:layout_constraintTop_toBottomOf="@+id/elipse_center_x"
+            tools:ignore="MissingConstraints" />
+
+        <SeekBar
+            android:id="@+id/elipse_center_y"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/txtEllipseCenterY"
+            app:layout_constraintStart_toStartOf="@+id/txtEllipseCenterY"
+            app:layout_constraintTop_toBottomOf="@+id/txtEllipseCenterY" />
+
+
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="#64b5f6"
+            android:text="GUARDAR"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/btn_cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.96" />
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:textStyle="bold"
+            android:backgroundTint="#f44336"
+            android:text="CANCELAR"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+<pl.droidsonroids.gif.GifImageView
+    android:visibility="invisible"
+    android:id="@+id/gif"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
