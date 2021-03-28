@@ -19,6 +19,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import static com.example.flircovid19.FaceDetection.FaceDetection.bitmap_preview;
+import static com.example.flircovid19.FaceDetection.FaceDetection.detected;
 import static com.example.flircovid19.FaceDetection.FaceDetection.hasMask;
 import static com.example.flircovid19.FaceDetection.FaceDetection.temperature;
 
@@ -79,6 +80,7 @@ public class PreviewActivity extends AppCompatActivity {
             @Override
             public void run() {
                 bitmap_preview=null;
+                detected=false;
                 finish();
             }
         },seconds*1000);

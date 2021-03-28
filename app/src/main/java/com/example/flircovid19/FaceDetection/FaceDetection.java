@@ -32,7 +32,7 @@ public class FaceDetection {
     public static int DEFAULT_CENTER_Y=1092>>1;
     public static int CENTER_X=0;
     public static int CENTER_Y=0;
-    private static boolean detected = false;
+    public static boolean detected = false;
     private static int awaint = 0;
     private static int awaitingCount = 0;
     private static Paint paintText = new Paint();
@@ -116,10 +116,11 @@ public class FaceDetection {
         System.out.println("detected:" + x_face+"x"+y_face+"---->"+center_x+"x"+center_y);
 
         //tolerancia
-        double tolerance = 20;
+        double tolerance_center = 40;
+        double tolerance_width = 50;
         // Verifico si el tamaño de la cara es igual al tamaño del eje menor (eje_X) con una tolerancia de +-20px
-        boolean faceIsWidth = Math.abs((face.getBoundingBox().width() - (AXIS_MENOR))) <= tolerance;
-        boolean facePointIsCenter = Math.abs(x - center_x) <= tolerance && Math.abs(y - center_y) <= tolerance;
+        boolean faceIsWidth = Math.abs((face.getBoundingBox().width() - (AXIS_MENOR))) <= tolerance_width;
+        boolean facePointIsCenter = Math.abs(x - center_x) <= tolerance_center && Math.abs(y - center_y) <= tolerance_center;
         //formula de ellipse= [(x-h)²/b²] + [(y-k)²/b²]=1
         //Verifico si el punto pertenece al elipse
         boolean isEmptyFaceInEllipse = (Math.pow((x - center_x), 2) / AXIS_MENOR) + (Math.pow((y - center_y), 2) / AXIS_MAJOR) <= AXIS_MAJOR;
