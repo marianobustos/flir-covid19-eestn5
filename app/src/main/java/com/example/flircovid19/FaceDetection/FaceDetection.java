@@ -21,6 +21,8 @@ import org.tensorflow.lite.support.label.Category;
 import java.io.IOException;
 import java.util.List;
 
+import static com.example.flircovid19.MainActivity.debug;
+
 public class FaceDetection {
     public static float temperature=50;
     public static boolean hasMask =false;
@@ -35,12 +37,16 @@ public class FaceDetection {
     public static boolean detected = false;
     private static int awaint = 0;
     private static int awaitingCount = 0;
+    private static Paint paintToleranceWidth = new Paint();
+    private static Paint paintToleranceCenter = new Paint();
     private static Paint paintText = new Paint();
     private static int color;
     private static Context context;
     public static Bitmap bitmap_preview;
     private static boolean asd=false;
-
+    //tolerancia
+    private  static int tolerance_center = 40;
+    private static int tolerance_width = 50;
     public static void setContext(Context ctx){
         context=ctx;
     }
@@ -58,6 +64,22 @@ public class FaceDetection {
                 ((canvas.getHeight() >> 1) + (AXIS_MAJOR + 80) / 2)+CENTER_Y,
                 paint
         );
+    }
+
+    public static void DrawingTolerance(Canvas canvas){
+        float center_x = (canvas.getWidth() >> 1) +CENTER_X;
+        float center_y = (canvas.getHeight() >> 1) +CENTER_Y;
+        float drawInitX=center_x-(AXIS_MENOR/2)-(tolerance_width/2);
+        paintToleranceCenter.setColor(Color.GREEN);
+        paintToleranceCenter.setStyle(Paint.Style.STROKE);
+        paintToleranceCenter.setStrokeWidth(0.5f);
+        canvas.drawCircle(center_x, center_y, tolerance_center, paintToleranceCenter);
+
+        paintToleranceWidth.setColor(Color.YELLOW);
+        paintToleranceCenter.setStyle(Paint.Style.STROKE);
+        paintToleranceWidth.setStrokeWidth(3);
+
+        canvas.drawLine(drawInitX,center_y,drawInitX+AXIS_MENOR+tolerance_width,center_y,paintToleranceWidth);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -78,7 +100,7 @@ public class FaceDetection {
 
             if (awaitingCount++ > 5) {
                 awaitingCount=0;
-                if(context instanceof  MainActivity){
+                if(context instanceof  MainActivity && !debug){
                     context.startActivity(new Intent(context, PreviewActivity.class));
                 }
 
@@ -93,7 +115,7 @@ public class FaceDetection {
             awaitingCount=0;
 
         }
-
+        DrawingTolerance(canvas);
         canvas.drawOval(center_x, center_y, center_x + AXIS_MENOR, center_y + AXIS_MAJOR, paint);
     }
 
@@ -115,9 +137,7 @@ public class FaceDetection {
         y_face = y;
         System.out.println("detected:" + x_face+"x"+y_face+"---->"+center_x+"x"+center_y);
 
-        //tolerancia
-        double tolerance_center = 40;
-        double tolerance_width = 50;
+
         // Verifico si el tamaño de la cara es igual al tamaño del eje menor (eje_X) con una tolerancia de +-20px
         boolean faceIsWidth = Math.abs((face.getBoundingBox().width() - (AXIS_MENOR))) <= tolerance_width;
         boolean facePointIsCenter = Math.abs(x - center_x) <= tolerance_center && Math.abs(y - center_y) <= tolerance_center;

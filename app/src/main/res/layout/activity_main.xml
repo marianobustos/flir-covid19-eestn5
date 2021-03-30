@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <com.example.flircovid19.CameraSourcePreview
+        android:visibility="visible"
         android:id="@+id/firePreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -80,7 +81,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_debug"
         android:visibility="invisible"
-        android:layout_width="300dp"
+        android:layout_width="700px"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -128,7 +129,7 @@
             app:layout_constraintTop_toBottomOf="@+id/txtEllipseY" />
 
         <TextView
-            android:layout_marginTop="70dp"
+            android:layout_marginTop="20dp"
             android:id="@+id/txtEllipseCenterX"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -169,6 +170,29 @@
             app:layout_constraintTop_toBottomOf="@+id/txtEllipseCenterY" />
 
 
+        <ImageView
+            android:id="@+id/imgView_flir"
+            android:layout_width="480px"
+            android:layout_height="640px"
+            android:rotation="270"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/elipse_center_y" />
+
+        <TextView
+            android:id="@+id/txt_temperatura"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:text="TEMPERATURA"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="@+id/imgView_flir"
+            app:layout_constraintStart_toStartOf="@+id/imgView_flir"
+            app:layout_constraintTop_toBottomOf="@+id/elipse_center_y"
+            tools:ignore="MissingConstraints" />
+        />
+
 
         <Button
             android:id="@+id/btn_save"
@@ -206,4 +230,5 @@
     android:id="@+id/gif"
     android:layout_width="match_parent"
     android:layout_height="match_parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

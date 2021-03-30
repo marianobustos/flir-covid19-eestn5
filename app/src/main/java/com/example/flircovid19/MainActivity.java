@@ -12,10 +12,16 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -73,19 +79,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ConstraintLayout defaultLayout, debugLayout;
     private Button btnSave, btnCancel;
     private GifImageView gif;
-    private int auxAxisMenor,auxAxisMejor;
-    private int auxCenterX,auxCenterY;
+    private int auxAxisMenor, auxAxisMejor;
+    private int auxCenterX, auxCenterY;
     //elipse length
-    private SeekBar ellipseX,ellipseY;
-    private TextView txtEllipseX,txtEllipseY;
+    private SeekBar ellipseX, ellipseY;
+    private TextView txtEllipseX, txtEllipseY;
 
-    private final String KEY_AXIS_X="KEY_AXIS_X";
-    private final String KEY_AXIS_Y="KEY_AXIS_Y";
+    private final String KEY_AXIS_X = "KEY_AXIS_X";
+    private final String KEY_AXIS_Y = "KEY_AXIS_Y";
     //elipse centro
-    private SeekBar ellipseCenterX,ellipseCenterY;
-    private TextView txtEllipseCenterX,txtEllipseCenterY;
-    private final String KEY_AXIS_CENTER_X="KEY_AXIS_CENTER_X";
-    private final String KEY_AXIS_CENTER_Y="KEY_AXIS_CENTER_Y";
+    private SeekBar ellipseCenterX, ellipseCenterY;
+    private TextView txtEllipseCenterX, txtEllipseCenterY;
+    private final String KEY_AXIS_CENTER_X = "KEY_AXIS_CENTER_X";
+    private final String KEY_AXIS_CENTER_Y = "KEY_AXIS_CENTER_Y";
+    //DEBUG
+    public static Boolean debug = false;
+    //DRAWING
+    private TextView txtTemperatura;
+    Canvas canvas;
+    Paint paint;
+    //TEMPERATURA
+    private int auxTouchX, auxtouchY;
+    public static int touchX = 0, touchY = 0;
+    private final String KEY_AXIS_TEMPERATURE_X = "KEY_AXIS_TEMPERATURE_X";
+    private final String KEY_AXIS_TEMPERATURE_Y = "KEY_AXIS_TEMPERATURE_Y";
 
 
     @Override
@@ -95,8 +112,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         context = this;
 
         //shared
-        sharedPreferences=this.getSharedPreferences("APP",MODE_PRIVATE);
-        editor=sharedPreferences.edit();
+        sharedPreferences = this.getSharedPreferences("APP", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         //IA
         FaceDetection.setContext(this);
         preview = findViewById(R.id.firePreview);
@@ -108,11 +125,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             getRuntimePermissions();
         }
 
+        defaultAxis();
+        getAxis();
+
         /**flir**/
         ThermalLog.LogLevel enableLoggingInDebug = BuildConfig.DEBUG ? ThermalLog.LogLevel.DEBUG : ThermalLog.LogLevel.NONE;
         ThermalSdkAndroid.init(this, enableLoggingInDebug);
 
-        //imgViewFlir = findViewById(R.id.imgView_flir);
+        imgViewFlir = findViewById(R.id.imgView_flir);
+        imgViewFlir.getLayoutParams().height = 640;
+        imgViewFlir.getLayoutParams().width = 480;
+        paint = new Paint();
+
+        txtTemperatura = findViewById(R.id.txt_temperatura);
+
+        imgViewFlir.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                int[] viewCoords = new int[2];
+                imgViewFlir.getLocationOnScreen(viewCoords);
+                touchX = (int) event.getX();
+                touchY = (int) event.getY();
+
+                return true;
+            }
+        });
         flirCameraHandler = new FlirCameraHandler();
         discoveryStatus.started();
         flirCameraHandler.startDicovery(cameraDiscoveryEventListener, discoveryStatus);
@@ -124,8 +161,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         defaultLayout = findViewById(R.id.default_layout);
         debugLayout = findViewById(R.id.layout_debug);
         imgViewBtn = findViewById(R.id.bt_debug);
-        defaultAxis();
-        getAxis();
         imgViewBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -140,10 +175,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnCancel.setOnClickListener(this);
 
         /*ellipse*/
-        txtEllipseX=findViewById(R.id.txtEllipseX);
-        txtEllipseY=findViewById(R.id.txtEllipseY);
-        ellipseX=findViewById(R.id.elipse_x);
-        ellipseY=findViewById(R.id.elipse_y);
+        txtEllipseX = findViewById(R.id.txtEllipseX);
+        txtEllipseY = findViewById(R.id.txtEllipseY);
+        ellipseX = findViewById(R.id.elipse_x);
+        ellipseY = findViewById(R.id.elipse_y);
 
         txtEllipseX.setText("Elipse X: ".concat(String.valueOf(AXIS_MENOR)).concat("px"));
         ellipseX.setProgress((int) AXIS_MENOR);
@@ -157,19 +192,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ellipseY.setOnSeekBarChangeListener(ellipseYListener);
 
         //ellipse center
-        txtEllipseCenterX=findViewById(R.id.txtEllipseCenterX);
-        txtEllipseCenterY=findViewById(R.id.txtEllipseCenterY);
-        ellipseCenterX=findViewById(R.id.elipse_center_x);
-        ellipseCenterY=findViewById(R.id.elipse_center_y);
+        txtEllipseCenterX = findViewById(R.id.txtEllipseCenterX);
+        txtEllipseCenterY = findViewById(R.id.txtEllipseCenterY);
+        ellipseCenterX = findViewById(R.id.elipse_center_x);
+        ellipseCenterY = findViewById(R.id.elipse_center_y);
 
 
         txtEllipseCenterY.setText("Elipse centro Y: ".concat(String.valueOf(CENTER_Y)).concat("px"));
         ellipseCenterY.setProgress(CENTER_Y);
-        ellipseCenterY.setMax(DEFAULT_CENTER_Y*2);
+        ellipseCenterY.setMax(DEFAULT_CENTER_Y * 2);
 
         txtEllipseCenterX.setText("Elipse centro X: ".concat(String.valueOf(CENTER_X)).concat("px"));
         ellipseCenterX.setProgress(CENTER_X);
-        ellipseCenterX.setMax(DEFAULT_CENTER_X*2);
+        ellipseCenterX.setMax(DEFAULT_CENTER_X * 2);
 
         ellipseCenterX.setOnSeekBarChangeListener(ellipseCenterXListener);
         ellipseCenterY.setOnSeekBarChangeListener(ellipseCenterYListener);
@@ -178,32 +213,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /************************************** DEBUG *************************************/
-    private void getAxis(){
-        AXIS_MENOR=sharedPreferences.getFloat(KEY_AXIS_X,300);
-        AXIS_MAJOR=sharedPreferences.getFloat(KEY_AXIS_Y,400);
-        CENTER_X=sharedPreferences.getInt(KEY_AXIS_CENTER_X,0);
-        CENTER_Y=sharedPreferences.getInt(KEY_AXIS_CENTER_Y,0);
+    private void getAxis() {
+        AXIS_MENOR = sharedPreferences.getFloat(KEY_AXIS_X, 300);
+        AXIS_MAJOR = sharedPreferences.getFloat(KEY_AXIS_Y, 400);
+        CENTER_X = sharedPreferences.getInt(KEY_AXIS_CENTER_X, 0);
+        CENTER_Y = sharedPreferences.getInt(KEY_AXIS_CENTER_Y, 0);
+        touchX = sharedPreferences.getInt(KEY_AXIS_TEMPERATURE_X, 240);
+        touchY = sharedPreferences.getInt(KEY_AXIS_TEMPERATURE_Y, 620);
     }
-    private void SaveAxis(float x,float y,int cx,int cy){
-        editor.putFloat(KEY_AXIS_X,x);
-        editor.putFloat(KEY_AXIS_Y,y);
-        editor.putInt(KEY_AXIS_CENTER_X,cx);
-        editor.putInt(KEY_AXIS_CENTER_Y,cy);
+
+    private void SaveAxis(float x, float y, int cx, int cy, int tx, int ty) {
+        editor.putFloat(KEY_AXIS_X, x);
+        editor.putFloat(KEY_AXIS_Y, y);
+        editor.putInt(KEY_AXIS_CENTER_X, cx);
+        editor.putInt(KEY_AXIS_CENTER_Y, cy);
+        editor.putInt(KEY_AXIS_TEMPERATURE_X, tx);
+        editor.putInt(KEY_AXIS_TEMPERATURE_Y, ty);
         editor.commit();
     }
-    private void defaultAxis(){
-        auxAxisMejor= (int) AXIS_MAJOR;
-        auxAxisMenor= (int) AXIS_MENOR;
-        auxCenterX=CENTER_X;
-        auxCenterY=CENTER_Y;
+
+    private void defaultAxis() {
+        auxAxisMejor = (int) AXIS_MAJOR;
+        auxAxisMenor = (int) AXIS_MENOR;
+        auxCenterX = CENTER_X;
+        auxCenterY = CENTER_Y;
+        auxTouchX = touchX;
+        auxtouchY = touchY;
 
     }
 
     //ELLIPSE CENTROS
-    SeekBar.OnSeekBarChangeListener ellipseCenterXListener=new SeekBar.OnSeekBarChangeListener() {
+    SeekBar.OnSeekBarChangeListener ellipseCenterXListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            CENTER_X=i-DEFAULT_CENTER_X;
+            CENTER_X = i - DEFAULT_CENTER_X;
             txtEllipseCenterX.setText("Elipse centro X: ".concat(String.valueOf(CENTER_X)).concat("px"));
         }
 
@@ -221,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SeekBar.OnSeekBarChangeListener ellipseCenterYListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            CENTER_Y=i-DEFAULT_CENTER_Y;
+            CENTER_Y = i - DEFAULT_CENTER_Y;
             txtEllipseCenterY.setText("Elipse centro Y: ".concat(String.valueOf(CENTER_Y)).concat("px"));
 
 
@@ -240,10 +283,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     //ELLIPSE
-    SeekBar.OnSeekBarChangeListener ellipseXListener=new SeekBar.OnSeekBarChangeListener() {
+    SeekBar.OnSeekBarChangeListener ellipseXListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            AXIS_MENOR=i;
+            AXIS_MENOR = i;
             txtEllipseX.setText("Elipse X: ".concat(String.valueOf(i)).concat("px"));
         }
 
@@ -261,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     SeekBar.OnSeekBarChangeListener ellipseYListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            AXIS_MAJOR=i;
+            AXIS_MAJOR = i;
             txtEllipseY.setText("Elipse Y: ".concat(String.valueOf(i)).concat("px"));
 
 
@@ -279,16 +322,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     };
 
 
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_cancel:
                 ToggleView();
-                AXIS_MAJOR=auxAxisMejor;
-                AXIS_MENOR=auxAxisMenor;
-                CENTER_X=auxCenterX;
-                CENTER_Y=auxCenterY;
+                AXIS_MAJOR = auxAxisMejor;
+                AXIS_MENOR = auxAxisMenor;
+                CENTER_X = auxCenterX;
+                CENTER_Y = auxCenterY;
                 txtEllipseX.setText("Elipse X: ".concat(String.valueOf(AXIS_MENOR)).concat("px"));
                 txtEllipseY.setText("Elipse Y: ".concat(String.valueOf(AXIS_MAJOR)).concat("px"));
                 txtEllipseCenterX.setText("Elipse centro X: ".concat(String.valueOf(CENTER_X)).concat("px"));
@@ -297,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_save:
                 ToggleView();
-                SaveAxis(AXIS_MENOR,AXIS_MAJOR,CENTER_X,CENTER_Y);
+                SaveAxis(AXIS_MENOR, AXIS_MAJOR, CENTER_X, CENTER_Y, touchX, touchY);
                 break;
         }
 
@@ -330,18 +372,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         GifRandomResource();
         if (defaultLayout.getVisibility() == View.VISIBLE) {
             //debug view visibility
+            debug = true;
             defaultLayout.setVisibility(View.INVISIBLE);
             debugLayout.setVisibility(View.VISIBLE);
-            gif.setVisibility(View.VISIBLE);
+            /*gif.setVisibility(View.VISIBLE);
 
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     gif.setVisibility(View.INVISIBLE);
                 }
-            },6000);
+            }, 3500);*/
         } else {
             //default layout visibility
+            debug = false;
             defaultLayout.setVisibility(View.VISIBLE);
             debugLayout.setVisibility(View.INVISIBLE);
             gif.setVisibility(View.INVISIBLE);
@@ -427,7 +471,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void run() {
                         FlirFrameDataHolder poll = frameBuffer.poll();
                         setBitmapPreview(poll.flirMap);
-                        //imgViewFlir.setImageBitmap(poll.flirMap);
+
+                        Bitmap resize = Bitmap.createScaledBitmap(poll.flirMap, 480, 640, false);
+                        canvas = new Canvas(resize);
+                        paint.setColor(Color.GREEN);
+                        canvas.drawCircle(touchX, touchY, 5, paint);
+                        txtTemperatura.setText("Temperatura:" + FaceDetection.temperature + "ªC");
+                        imgViewFlir.setImageBitmap(resize);
                     }
                 });
             } catch (InterruptedException e) {
