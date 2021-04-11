@@ -59,6 +59,8 @@ import static com.example.flircovid19.FaceDetection.FaceDetection.CENTER_Y;
 import static com.example.flircovid19.FaceDetection.FaceDetection.DEFAULT_CENTER_X;
 import static com.example.flircovid19.FaceDetection.FaceDetection.DEFAULT_CENTER_Y;
 import static com.example.flircovid19.FaceDetection.FaceDetection.setBitmapPreview;
+import static com.example.flircovid19.FaceDetection.FaceDetection.tolerance_center;
+import static com.example.flircovid19.FaceDetection.FaceDetection.tolerance_width;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private SharedPreferences sharedPreferences;
@@ -99,10 +101,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Canvas canvas;
     Paint paint;
     //TEMPERATURA
-    private int auxTouchX, auxtouchY;
+    private int auxTouchX, auxTouchY;
     public static int touchX = 0, touchY = 0;
     private final String KEY_AXIS_TEMPERATURE_X = "KEY_AXIS_TEMPERATURE_X";
     private final String KEY_AXIS_TEMPERATURE_Y = "KEY_AXIS_TEMPERATURE_Y";
+
+    //Tolerancia
+    private SeekBar toleranceWidth, toleranceCenter;
+    private int auxToleranceCenter,auxToleranceWidth;
+    private final String KEY_TOLERANCE_WIDTH = "KEY_TOLERANCE_WIDTH";
+    private final String KEY_TOLERANCE_CENTER = "KEY_TOLERANCE_CENTER";
+
 
 
     @Override
@@ -209,6 +218,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ellipseCenterX.setOnSeekBarChangeListener(ellipseCenterXListener);
         ellipseCenterY.setOnSeekBarChangeListener(ellipseCenterYListener);
 
+        //Tolerance
+        toleranceCenter=findViewById(R.id.tolerance_center);
+        toleranceWidth=findViewById(R.id.tolerance_width);
+
+        toleranceWidth.setProgress(tolerance_width);
+        toleranceWidth.setMax(100);
+
+        toleranceCenter.setProgress(tolerance_center);
+        toleranceCenter.setMax(100);
+
+        toleranceWidth.setOnSeekBarChangeListener(toleranceWidthListener);
+        toleranceCenter.setOnSeekBarChangeListener(toleranceCenterListener);
+
+
+
+
 
     }
 
@@ -220,15 +245,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         CENTER_Y = sharedPreferences.getInt(KEY_AXIS_CENTER_Y, 0);
         touchX = sharedPreferences.getInt(KEY_AXIS_TEMPERATURE_X, 240);
         touchY = sharedPreferences.getInt(KEY_AXIS_TEMPERATURE_Y, 620);
+        tolerance_center = sharedPreferences.getInt(KEY_TOLERANCE_CENTER, 40);
+        tolerance_width = sharedPreferences.getInt(KEY_TOLERANCE_WIDTH, 50);
+
     }
 
-    private void SaveAxis(float x, float y, int cx, int cy, int tx, int ty) {
+    private void SaveAxis(float x, float y, int cx, int cy, int tx, int ty,int tc,int tw) {
         editor.putFloat(KEY_AXIS_X, x);
         editor.putFloat(KEY_AXIS_Y, y);
         editor.putInt(KEY_AXIS_CENTER_X, cx);
         editor.putInt(KEY_AXIS_CENTER_Y, cy);
         editor.putInt(KEY_AXIS_TEMPERATURE_X, tx);
         editor.putInt(KEY_AXIS_TEMPERATURE_Y, ty);
+        editor.putInt(KEY_TOLERANCE_CENTER, tc);
+        editor.putInt(KEY_TOLERANCE_WIDTH, tw);
         editor.commit();
     }
 
@@ -238,10 +268,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         auxCenterX = CENTER_X;
         auxCenterY = CENTER_Y;
         auxTouchX = touchX;
-        auxtouchY = touchY;
+        auxTouchY = touchY;
+        auxToleranceCenter=tolerance_center;
+        auxToleranceWidth=tolerance_width;
 
     }
+    //TOLERANCIA
 
+    SeekBar.OnSeekBarChangeListener toleranceCenterListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            tolerance_center=i;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
+
+    SeekBar.OnSeekBarChangeListener toleranceWidthListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            tolerance_width=i;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
     //ELLIPSE CENTROS
     SeekBar.OnSeekBarChangeListener ellipseCenterXListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
@@ -331,6 +397,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 AXIS_MENOR = auxAxisMenor;
                 CENTER_X = auxCenterX;
                 CENTER_Y = auxCenterY;
+                touchX=auxTouchX;
+                touchY=auxTouchY;
+                tolerance_width=auxToleranceWidth;
+                tolerance_center=auxToleranceCenter;
                 txtEllipseX.setText("Elipse X: ".concat(String.valueOf(AXIS_MENOR)).concat("px"));
                 txtEllipseY.setText("Elipse Y: ".concat(String.valueOf(AXIS_MAJOR)).concat("px"));
                 txtEllipseCenterX.setText("Elipse centro X: ".concat(String.valueOf(CENTER_X)).concat("px"));
@@ -339,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_save:
                 ToggleView();
-                SaveAxis(AXIS_MENOR, AXIS_MAJOR, CENTER_X, CENTER_Y, touchX, touchY);
+                SaveAxis(AXIS_MENOR, AXIS_MAJOR, CENTER_X, CENTER_Y, touchX, touchY,tolerance_center,tolerance_width);
                 break;
         }
 

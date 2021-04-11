@@ -45,8 +45,8 @@ public class FaceDetection {
     public static Bitmap bitmap_preview;
     private static boolean asd=false;
     //tolerancia
-    private  static int tolerance_center = 40;
-    private static int tolerance_width = 50;
+    public  static int tolerance_center = 40;
+    public static int tolerance_width = 50;
     public static void setContext(Context ctx){
         context=ctx;
     }
@@ -70,16 +70,18 @@ public class FaceDetection {
         float center_x = (canvas.getWidth() >> 1) +CENTER_X;
         float center_y = (canvas.getHeight() >> 1) +CENTER_Y;
         float drawInitX=center_x-(AXIS_MENOR/2)-(tolerance_width/2);
-        paintToleranceCenter.setColor(Color.GREEN);
+        float drawEndX=center_x+(AXIS_MENOR/2)-(tolerance_width/2);
+        paintToleranceCenter.setColor(Color.RED);
         paintToleranceCenter.setStyle(Paint.Style.STROKE);
-        paintToleranceCenter.setStrokeWidth(0.5f);
+        paintToleranceCenter.setStrokeWidth(1f);
         canvas.drawCircle(center_x, center_y, tolerance_center, paintToleranceCenter);
 
-        paintToleranceWidth.setColor(Color.YELLOW);
+        paintToleranceWidth.setColor(Color.RED);
         paintToleranceCenter.setStyle(Paint.Style.STROKE);
-        paintToleranceWidth.setStrokeWidth(3);
+        paintToleranceWidth.setStrokeWidth(8);
 
-        canvas.drawLine(drawInitX,center_y,drawInitX+AXIS_MENOR+tolerance_width,center_y,paintToleranceWidth);
+        canvas.drawLine(drawInitX,center_y,drawInitX+tolerance_width,center_y,paintToleranceWidth);
+        canvas.drawLine(drawEndX,center_y,drawEndX+tolerance_width,center_y,paintToleranceWidth);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -115,7 +117,9 @@ public class FaceDetection {
             awaitingCount=0;
 
         }
-        DrawingTolerance(canvas);
+        //if(debug){
+            DrawingTolerance(canvas);
+        //}
         canvas.drawOval(center_x, center_y, center_x + AXIS_MENOR, center_y + AXIS_MAJOR, paint);
     }
 
