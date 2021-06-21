@@ -545,7 +545,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Bitmap resize = Bitmap.createScaledBitmap(poll.flirMap, 480, 640, false);
                         canvas = new Canvas(resize);
                         paint.setColor(Color.GREEN);
-                        canvas.drawCircle(touchX, touchY, 5, paint);
+                        //.drawCircle(touchX, touchY, 5, paint);
+
+                        //canvas.drawRect(150,200,400,400,paint);
+                        canvas.drawRect(touchX-125,touchY-100,touchX+125,touchY+100,paint);
                         txtTemperatura.setText("Temperatura:" + FaceDetection.temperature + "ªC");
                         imgViewFlir.setImageBitmap(resize);
                     }

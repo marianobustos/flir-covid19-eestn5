@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import com.example.flircovid19.FaceDetection.FaceDetection;
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
@@ -28,6 +31,7 @@ import com.flir.thermalsdk.live.streaming.ThermalImageStreamListener;
 
 import java.io.IOException;
 import java.nio.Buffer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,12 +40,13 @@ import static com.example.flircovid19.FaceDetection.FaceDetection.y_face;
 import static com.example.flircovid19.MainActivity.touchX;
 import static com.example.flircovid19.MainActivity.touchY;
 
+
 public class FlirCameraHandler {
     private static final String TAG = "FlirCameraHandler";
     private Camera camera;
     private StreamDataListener streamDataListener;
     private boolean drawingCircle=true;
-
+    int tempMaxDrop=0;
     public FlirCameraHandler() {
     }
 
@@ -78,6 +83,7 @@ public class FlirCameraHandler {
 
 
     private final Camera.Consumer<ThermalImage> handleIncomingImage = new Camera.Consumer<ThermalImage>() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void accept(ThermalImage thermalImage) {
             thermalImage.setPalette(PaletteManager.getDefaultPalettes().get(0));//img filter
@@ -96,9 +102,23 @@ public class FlirCameraHandler {
 
                 thermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
                 double temperature = thermalImage.getValueAt(new Point(touchX,touchY));
-                FaceDetection.temperature= (float) temperature;
+                Rectangle framePic = new Rectangle(touchX - 125, touchY - 100, 250, 200);
+                double[] tempetaruteQuad = thermalImage.getValues(framePic);
+                double maximoQuad = Arrays.stream(tempetaruteQuad).max().getAsDouble();
+                FaceDetection.temperature= (float) maximoQuad;
                 //System.out.println("FLIR:"+(int)x_point+"x"+(int)y_point+"TEMPERATURE:"+temperature);
                 System.out.println("FLIR:temp:"+(int)touchX+"x"+(int)touchY+"TEMPERATURE:"+temperature);
+                System.out.println("Touch X: " + touchX + "   Touch Y:" + touchY);
+
+                if(maximoQuad > 37 ){
+                    tempMaxDrop++;
+                    System.out.println("Temperatura Drop:" + (double)maximoQuad + "  Contador Drop:  "+ (int)tempMaxDrop);
+                }
+                else {
+                    tempMaxDrop=0;
+                    System.out.println("Temperatura máxima del frame:" + (double)maximoQuad );
+                }
+
 
             }catch (Exception e){
             }
