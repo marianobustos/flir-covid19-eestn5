@@ -13,7 +13,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ELECTRÓNICA 2020 \n PRÁCTICAS PROFESIONALIZANTE"
+        android:text="ELECTRÓNICA 2020/21 \n PRÁCTICAS PROFESIONALIZANTE"
         android:textAlignment="center"
         android:textColor="#fff"
         android:textSize="50dp"

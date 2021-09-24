@@ -112,7 +112,13 @@ public class FaceGraphic extends Graphic {
         float top = y - yOffset;
         float right = x + xOffset;
         float bottom = y + yOffset;
-        canvas.drawRect(left, top, right, bottom, boxPaint);
-        FaceDetection.FaceIsDetected(canvas,face);
+        const int minFaceDetectionX = 600;
+        const int minFaceDetectionY = 600;
+
+        if (xOffset > minFaceDetectionX && yOffset > minFaceDetectionY) {
+            canvas.drawRect(left, top, right, bottom, boxPaint);
+            FaceDetection.FaceIsDetected(canvas,face);
+        }
+        
     }
 }
