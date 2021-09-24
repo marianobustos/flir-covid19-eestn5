@@ -66,7 +66,8 @@ public class FaceDetection {
         );
     }
 
-    public static void DrawingTolerance(Canvas canvas){
+    //Circulo de tolerancia #2021
+    /*public static void DrawingTolerance(Canvas canvas){
         float center_x = (canvas.getWidth() >> 1) +CENTER_X;
         float center_y = (canvas.getHeight() >> 1) +CENTER_Y;
         float drawInitX=center_x-(AXIS_MENOR/2)-(tolerance_width/2);
@@ -82,16 +83,20 @@ public class FaceDetection {
 
         canvas.drawLine(drawInitX,center_y,drawInitX+tolerance_width,center_y,paintToleranceWidth);
         canvas.drawLine(drawEndX,center_y,drawEndX+tolerance_width,center_y,paintToleranceWidth);
-    }
+    }*/
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public static void DrawingFaceEllipse(Canvas canvas) {
+    
+    //elipse de toma de temperatura #2021
+
+    /*public static void DrawingFaceEllipse(Canvas canvas) {
         float center_x = ((canvas.getWidth() >> 1) - (AXIS_MENOR / 2))+CENTER_X;
         float center_y = ((canvas.getHeight() >> 1) - (AXIS_MAJOR / 2))+CENTER_Y;
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5.0f);
 
+        //tiemp de espera para tomar temperatura
         if (detected) {
 
             paint.setStrokeWidth(10);
@@ -121,7 +126,7 @@ public class FaceDetection {
             DrawingTolerance(canvas);
         //}
         canvas.drawOval(center_x, center_y, center_x + AXIS_MENOR, center_y + AXIS_MAJOR, paint);
-    }
+    }*/
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -134,7 +139,10 @@ public class FaceDetection {
         float center_y = (canvas.getHeight() >> 1)+CENTER_Y;
 
         //Punto de la frente
-        float x = face.getBoundingBox().centerX() + 4 ;
+        //La camara termica esta 90° girada con respecto de la camara de la tablet
+        //#2021 Tomo el punto de medicion a 3/4 de la cara en el eje vertical
+        //esto se hace para no tomar la medicion sobre el barbijo
+        float x = face.getBoundingBox().centerX() + face.getWidth()/4 ;
         float y = face.getBoundingBox().centerY();
 
         x_face = x;

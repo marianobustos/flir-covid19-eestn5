@@ -75,6 +75,7 @@ public class FaceGraphic extends Graphic {
         float y = translateY(face.getBoundingBox().centerY());
         // face.getBoundingBox().DrawingFaceEllipse
         canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
+
     /*canvas.drawText("id: " + face.getTrackingId(), x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint);
     canvas.drawText(
         "happiness: " + String.format("%.2f", face.getSmilingProbability()),
@@ -112,13 +113,25 @@ public class FaceGraphic extends Graphic {
         float top = y - yOffset;
         float right = x + xOffset;
         float bottom = y + yOffset;
-        const int minFaceDetectionX = 600;
-        const int minFaceDetectionY = 600;
+        const int minFaceDetectionX = 500; //Ancho minimo de deteccion de rostro #2021
+        float margenX ; //#2021 #TODO Definir valor
+        float margenY;
 
-        if (xOffset > minFaceDetectionX && yOffset > minFaceDetectionY) {
-            canvas.drawRect(left, top, right, bottom, boxPaint);
-            FaceDetection.FaceIsDetected(canvas,face);
+        //filtro de tamaño para deteccion de rostro #2021
+        //compruebo que el ancho de la imagen sea mayor que el minimo
+        if(right - left > minFaceDetectionX){
+            //compruebo que el rostro este dentro de la region establecida entre el origen de la imagen y los margenes X e Y establecidos
+            if (left > 0 && right < canvas.getWidth() && top > 0 && bottom < canvas.getHeight()) {
+                //rectangulo dentro del canvas
+                if (right < margenX && bottom < margenY) {
+                    //rectangulo valido, dibujo el rectangulo
+                    canvas.drawRect(left, top, right, bottom, boxPaint);
+                    FaceDetection.FaceIsDetected(canvas,face);
+
+                }
+            }
+
+
         }
-        
     }
 }
