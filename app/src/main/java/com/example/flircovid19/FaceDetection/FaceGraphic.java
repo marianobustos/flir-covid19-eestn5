@@ -12,6 +12,9 @@ import com.example.flircovid19.GraphicOverlay;
 import com.example.flircovid19.GraphicOverlay.Graphic;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 
+import static com.example.flircovid19.MainActivity.touchX;
+import static com.example.flircovid19.MainActivity.touchY;
+
 public class FaceGraphic extends Graphic {
     private static final float FACE_POSITION_RADIUS = 10.0f;
     private static final float ID_TEXT_SIZE = 40.0f;
@@ -113,21 +116,28 @@ public class FaceGraphic extends Graphic {
         float top = y - yOffset;
         float right = x + xOffset;
         float bottom = y + yOffset;
-        const int minFaceDetectionX = 500; //Ancho minimo de deteccion de rostro #2021
-        float margenX ; //#2021 #TODO Definir valor
-        float margenY;
+        int minFaceDetectionX = 400; //Ancho minimo de deteccion de rostro #2021
+        float margenX = canvas.getWidth(); //#2021 #TODO Definir valor
+        float margenY = 700;
+        float offSetX = 0;
+        float offSetY = 100;
 
         //filtro de tamaño para deteccion de rostro #2021
         //compruebo que el ancho de la imagen sea mayor que el minimo
+        System.out.println("FACE: Reconocimiento de rostro");
+        // #2021 Dibujo la región válida
+        canvas.drawRect(offSetX,offSetY,offSetX+margenX,offSetY+margenY,boxPaint);
         if(right - left > minFaceDetectionX){
+            System.out.println("FACE: Ancho OK");
             //compruebo que el rostro este dentro de la region establecida entre el origen de la imagen y los margenes X e Y establecidos
             if (left > 0 && right < canvas.getWidth() && top > 0 && bottom < canvas.getHeight()) {
+                System.out.println("FACE: Rostro en imagen");
                 //rectangulo dentro del canvas
                 if (right < margenX && bottom < margenY) {
+                    System.out.println("FACE: Rostro válido");
                     //rectangulo valido, dibujo el rectangulo
                     canvas.drawRect(left, top, right, bottom, boxPaint);
                     FaceDetection.FaceIsDetected(canvas,face);
-
                 }
             }
 

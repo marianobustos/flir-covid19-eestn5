@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.example.flircovid19.MainActivity.debug;
+import static com.example.flircovid19.MainActivity.touchX;
+import static com.example.flircovid19.MainActivity.touchY;
 
 public class FaceDetection {
     public static float temperature=50;
@@ -85,11 +87,11 @@ public class FaceDetection {
         canvas.drawLine(drawEndX,center_y,drawEndX+tolerance_width,center_y,paintToleranceWidth);
     }*/
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    //@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     
     //elipse de toma de temperatura #2021
 
-    /*public static void DrawingFaceEllipse(Canvas canvas) {
+    public static void DrawingFaceEllipse(Canvas canvas) {
         float center_x = ((canvas.getWidth() >> 1) - (AXIS_MENOR / 2))+CENTER_X;
         float center_y = ((canvas.getHeight() >> 1) - (AXIS_MAJOR / 2))+CENTER_Y;
         Paint paint = new Paint();
@@ -104,13 +106,12 @@ public class FaceDetection {
             paintText.setColor(Color.parseColor("#ffc107"));
             DrawingText(canvas, "Espere...", paintText);
 
-
-            if (awaitingCount++ > 5) {
+            // Espero 2 segundos para impacientar al usuario
+            if (awaitingCount++ > 2) {
                 awaitingCount=0;
                 if(context instanceof  MainActivity && !debug){
                     context.startActivity(new Intent(context, PreviewActivity.class));
                 }
-
             }
 
         } else{
@@ -123,10 +124,10 @@ public class FaceDetection {
 
         }
         //if(debug){
-            DrawingTolerance(canvas);
+         //   DrawingTolerance(canvas);
         //}
-        canvas.drawOval(center_x, center_y, center_x + AXIS_MENOR, center_y + AXIS_MAJOR, paint);
-    }*/
+        //canvas.drawOval(center_x, center_y, center_x + AXIS_MENOR, center_y + AXIS_MAJOR, paint);
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -142,22 +143,24 @@ public class FaceDetection {
         //La camara termica esta 90° girada con respecto de la camara de la tablet
         //#2021 Tomo el punto de medicion a 3/4 de la cara en el eje vertical
         //esto se hace para no tomar la medicion sobre el barbijo
-        float x = face.getBoundingBox().centerX() + face.getWidth()/4 ;
+        float x = face.getBoundingBox().centerX() + face.getBoundingBox().width()/4 ;
         float y = face.getBoundingBox().centerY();
-
+        // Actualizo punto de lectura
+        touchX=(int)x;
+        touchY=(int)y;
         x_face = x;
         y_face = y;
         System.out.println("detected:" + x_face+"x"+y_face+"---->"+center_x+"x"+center_y);
 
 
         // Verifico si el tamaño de la cara es igual al tamaño del eje menor (eje_X) con una tolerancia de +-20px
-        boolean faceIsWidth = Math.abs((face.getBoundingBox().width() - (AXIS_MENOR))) <= tolerance_width;
-        boolean facePointIsCenter = Math.abs(x - center_x) <= tolerance_center && Math.abs(y - center_y) <= tolerance_center;
+        //boolean faceIsWidth = Math.abs((face.getBoundingBox().width() - (AXIS_MENOR))) <= tolerance_width;
+        //boolean facePointIsCenter = Math.abs(x - center_x) <= tolerance_center && Math.abs(y - center_y) <= tolerance_center;
         //formula de ellipse= [(x-h)²/b²] + [(y-k)²/b²]=1
         //Verifico si el punto pertenece al elipse
-        boolean isEmptyFaceInEllipse = (Math.pow((x - center_x), 2) / AXIS_MENOR) + (Math.pow((y - center_y), 2) / AXIS_MAJOR) <= AXIS_MAJOR;
-        detected = isEmptyFaceInEllipse && faceIsWidth && facePointIsCenter;
-
+        //boolean isEmptyFaceInEllipse = (Math.pow((x - center_x), 2) / AXIS_MENOR) + (Math.pow((y - center_y), 2) / AXIS_MAJOR) <= AXIS_MAJOR;
+        //detected = isEmptyFaceInEllipse && faceIsWidth && facePointIsCenter;
+        detected = true;
     }
 
     public static void maskDetected(Context context, Bitmap image){
