@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi;
 import com.example.flircovid19.GraphicOverlay;
 import com.example.flircovid19.GraphicOverlay.Graphic;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
-
+import static com.example.flircovid19.FaceDetection.FaceDetection.detected;
 import static com.example.flircovid19.MainActivity.touchX;
 import static com.example.flircovid19.MainActivity.touchY;
 
@@ -21,6 +21,8 @@ public class FaceGraphic extends Graphic {
     private static final float ID_Y_OFFSET = 50.0f;
     private static final float ID_X_OFFSET = -50.0f;
     private static final float BOX_STROKE_WIDTH = 5.0f;
+    public static float x; // Coordenada X para el punto de medición de temperatura
+    public static float y; // Coordenada Y para el punto de medición de temperatura
 
     private static final int[] COLOR_CHOICES = {
             Color.BLUE //, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.RED, Color.WHITE, Color.YELLOW
@@ -73,11 +75,7 @@ public class FaceGraphic extends Graphic {
             return;
         }
 
-        // Draws a circle at the position of the detected face, with the face's track id below.
-        float x = translateX(face.getBoundingBox().centerX());
-        float y = translateY(face.getBoundingBox().centerY());
-        // face.getBoundingBox().DrawingFaceEllipse
-        canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
+
 
     /*canvas.drawText("id: " + face.getTrackingId(), x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint);
     canvas.drawText(
@@ -109,6 +107,8 @@ public class FaceGraphic extends Graphic {
           idPaint);
     }
 */
+        x = translateX(face.getBoundingBox().centerX());
+        y = translateY(face.getBoundingBox().centerY());
         // Draws a bounding box around the face.
         float xOffset = scaleX(face.getBoundingBox().width() / 2.0f);
         float yOffset = scaleY(face.getBoundingBox().height() / 2.0f);
@@ -117,25 +117,33 @@ public class FaceGraphic extends Graphic {
         float right = x + xOffset;
         float bottom = y + yOffset;
         int minFaceDetectionX = 400; //Ancho minimo de deteccion de rostro #2021
-        float margenX = canvas.getWidth(); //#2021 #TODO Definir valor
-        float margenY = 700;
+        float margenX = 1100; //#2021 #TODO Definir valor
+        float margenY = 850;
         float offSetX = 0;
-        float offSetY = 100;
+        float offSetY = 200;
 
         //filtro de tamaño para deteccion de rostro #2021
         //compruebo que el ancho de la imagen sea mayor que el minimo
         System.out.println("FACE: Reconocimiento de rostro");
         // #2021 Dibujo la región válida
         canvas.drawRect(offSetX,offSetY,offSetX+margenX,offSetY+margenY,boxPaint);
+        System.out.println("ROSTRO: ANCHO---->" + face.getBoundingBox().width());
+        System.out.println("ROSTRO: BOTTOM: " + bottom );
+        System.out.println("ROSTRO: TOP: " + top );
+        System.out.println("ROSTRO: LEFT: " + left );
+        System.out.println("ROSTRO: RIGHT: " + right );
+        detected=false;
         if(right - left > minFaceDetectionX){
             System.out.println("FACE: Ancho OK");
             //compruebo que el rostro este dentro de la region establecida entre el origen de la imagen y los margenes X e Y establecidos
             if (left > 0 && right < canvas.getWidth() && top > 0 && bottom < canvas.getHeight()) {
                 System.out.println("FACE: Rostro en imagen");
                 //rectangulo dentro del canvas
-                if (right < margenX && bottom < margenY) {
+                if (right < margenX && bottom < (margenY + offSetY)) {
                     System.out.println("FACE: Rostro válido");
                     //rectangulo valido, dibujo el rectangulo
+                    detected=true;
+                    System.out.println("ROSTRO: OK");
                     canvas.drawRect(left, top, right, bottom, boxPaint);
                     FaceDetection.FaceIsDetected(canvas,face);
                 }
@@ -143,5 +151,9 @@ public class FaceGraphic extends Graphic {
 
 
         }
+        // Draws a circle at the position of the detected face, with the face's track id below.
+        y = translateY(face.getBoundingBox().centerY()-face.getBoundingBox().height()/4);
+        // face.getBoundingBox().DrawingFaceEllipse
+        canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
     }
 }

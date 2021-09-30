@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.example.flircovid19.FaceDetection.FaceDetection;
+import static com.example.flircovid19.FaceDetection.FaceGraphic.x;
+import static com.example.flircovid19.FaceDetection.FaceGraphic.y;
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.DistanceUnit;
 import com.flir.thermalsdk.image.JavaImageBuffer;
@@ -25,6 +27,8 @@ import com.flir.thermalsdk.live.connectivity.ConnectionStatusListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryEventListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryFactory;
 import com.flir.thermalsdk.live.streaming.ThermalImageStreamListener;
+
+
 
 import java.io.IOException;
 import java.nio.Buffer;
@@ -95,12 +99,21 @@ public class FlirCameraHandler {
             try {
 
                 thermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
-                double temperature = thermalImage.getValueAt(new Point(touchX,touchY));
+
+                double temperature = thermalImage.getValueAt(new Point((int)x,(int)y));
                 FaceDetection.temperature= (float) temperature;
                 //System.out.println("FLIR:"+(int)x_point+"x"+(int)y_point+"TEMPERATURE:"+temperature);
                 System.out.println("FLIR:temp:"+(int)touchX+"x"+(int)touchY+"TEMPERATURE:"+temperature);
+                System.out.println("Punto X:" + x);
+                System.out.println("Punto Y:" + y);
+
 
             }catch (Exception e){
+                System.out.println("Punto X:" + x);
+                System.out.println("Punto Y:" + y);
+                System.out.println("ERROR:" + e);
+                System.out.println("TOUCH: X:" + touchX);
+                System.out.println("TOUCH: Y:" + touchY);
             }
             /*Canvas canvas = new Canvas(flirBitmap);
             Paint paint = new Paint();

@@ -13,6 +13,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
+import static com.example.flircovid19.FaceDetection.FaceDetection.detected;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +43,7 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
     }
     @Override
     protected Task<List<FirebaseVisionFace>> detectInImage(FirebaseVisionImage image) {
-        if(isEmptyFaces){
+        if(!isEmptyFaces){
          Thread barbijoThread= new Thread(){
                 @Override
                 public void run() {
@@ -61,7 +62,9 @@ public class FaceDetectionProcessor extends VisionProcessorBase<List<FirebaseVis
     protected void onSuccess(@NonNull List<FirebaseVisionFace> faces, @NonNull FrameMetadata frameMetadata, @NonNull GraphicOverlay graphicOverlay) {
 
         graphicOverlay.clear();
-        isEmptyFaces=faces.size()>0;
+        isEmptyFaces=!(faces.size()>0);
+        System.out.println("");
+        if(isEmptyFaces) detected = false;
         for (int i = 0; i < faces.size(); ++i) {
             FirebaseVisionFace face = faces.get(i);
             FaceGraphic faceGraphic = new FaceGraphic(graphicOverlay);

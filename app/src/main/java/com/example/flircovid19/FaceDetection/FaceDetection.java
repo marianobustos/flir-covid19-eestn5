@@ -106,8 +106,8 @@ public class FaceDetection {
             paintText.setColor(Color.parseColor("#ffc107"));
             DrawingText(canvas, "Espere...", paintText);
 
-            // Espero 2 segundos para impacientar al usuario
-            if (awaitingCount++ > 2) {
+            // Espero 5 segundos para impacientar al usuario
+            if (awaitingCount++ > 5) {
                 awaitingCount=0;
                 if(context instanceof  MainActivity && !debug){
                     context.startActivity(new Intent(context, PreviewActivity.class));
@@ -143,8 +143,8 @@ public class FaceDetection {
         //La camara termica esta 90° girada con respecto de la camara de la tablet
         //#2021 Tomo el punto de medicion a 3/4 de la cara en el eje vertical
         //esto se hace para no tomar la medicion sobre el barbijo
-        float x = face.getBoundingBox().centerX() + face.getBoundingBox().width()/4 ;
-        float y = face.getBoundingBox().centerY();
+        float x = face.getBoundingBox().centerX();
+        float y = face.getBoundingBox().centerY()-face.getBoundingBox().height()/4;
         // Actualizo punto de lectura
         touchX=(int)x;
         touchY=(int)y;
