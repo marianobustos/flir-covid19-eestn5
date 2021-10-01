@@ -79,21 +79,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //DEBUG
     private ImageView imgViewBtn;
     private ConstraintLayout defaultLayout, debugLayout;
-    private Button btnSave, btnCancel;
+    private Button btnCancel;
     private GifImageView gif;
-    private int auxAxisMenor, auxAxisMejor;
-    private int auxCenterX, auxCenterY;
-    //elipse length
-    private SeekBar ellipseX, ellipseY;
-    private TextView txtEllipseX, txtEllipseY;
 
-    private final String KEY_AXIS_X = "KEY_AXIS_X";
-    private final String KEY_AXIS_Y = "KEY_AXIS_Y";
-    //elipse centro
-    private SeekBar ellipseCenterX, ellipseCenterY;
-    private TextView txtEllipseCenterX, txtEllipseCenterY;
-    private final String KEY_AXIS_CENTER_X = "KEY_AXIS_CENTER_X";
-    private final String KEY_AXIS_CENTER_Y = "KEY_AXIS_CENTER_Y";
     //DEBUG
     public static Boolean debug = false;
     //DRAWING
@@ -101,16 +89,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Canvas canvas;
     Paint paint;
     //TEMPERATURA
-    private int auxTouchX, auxTouchY;
-    public static int touchX = 0, touchY = 0;
-    private final String KEY_AXIS_TEMPERATURE_X = "KEY_AXIS_TEMPERATURE_X";
-    private final String KEY_AXIS_TEMPERATURE_Y = "KEY_AXIS_TEMPERATURE_Y";
 
-    //Tolerancia
-    private SeekBar toleranceWidth, toleranceCenter;
-    private int auxToleranceCenter,auxToleranceWidth;
-    private final String KEY_TOLERANCE_WIDTH = "KEY_TOLERANCE_WIDTH";
-    private final String KEY_TOLERANCE_CENTER = "KEY_TOLERANCE_CENTER";
+    public static int touchX = 0, touchY = 0;
+
 
 
 
@@ -133,9 +114,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             getRuntimePermissions();
         }
-
-        defaultAxis();
-        getAxis();
 
         /**flir**/
         ThermalLog.LogLevel enableLoggingInDebug = BuildConfig.DEBUG ? ThermalLog.LogLevel.DEBUG : ThermalLog.LogLevel.NONE;
@@ -165,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**DEBUG**/
         gif = findViewById(R.id.gif);
-        btnSave = findViewById(R.id.btn_save);
+
         btnCancel = findViewById(R.id.btn_cancel);
         defaultLayout = findViewById(R.id.default_layout);
         debugLayout = findViewById(R.id.layout_debug);
@@ -173,243 +151,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imgViewBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                getAxis();
-                defaultAxis();
                 ToggleView();
                 return false;
             }
         });
 
-        btnSave.setOnClickListener(this);
+
         btnCancel.setOnClickListener(this);
-
-        /*ellipse*/
-        txtEllipseX = findViewById(R.id.txtEllipseX);
-        txtEllipseY = findViewById(R.id.txtEllipseY);
-        ellipseX = findViewById(R.id.elipse_x);
-        ellipseY = findViewById(R.id.elipse_y);
-
-        txtEllipseX.setText("Elipse X: ".concat(String.valueOf(AXIS_MENOR)).concat("px"));
-        ellipseX.setProgress((int) AXIS_MENOR);
-        ellipseX.setMax(1000);
-        ellipseX.setOnSeekBarChangeListener(ellipseXListener);
-
-
-        txtEllipseY.setText("Elipse Y: ".concat(String.valueOf(AXIS_MAJOR)).concat("px"));
-        ellipseY.setProgress((int) AXIS_MAJOR);
-        ellipseY.setMax(1000);
-        ellipseY.setOnSeekBarChangeListener(ellipseYListener);
-
-        //ellipse center
-        txtEllipseCenterX = findViewById(R.id.txtEllipseCenterX);
-        txtEllipseCenterY = findViewById(R.id.txtEllipseCenterY);
-        ellipseCenterX = findViewById(R.id.elipse_center_x);
-        ellipseCenterY = findViewById(R.id.elipse_center_y);
-
-
-        txtEllipseCenterY.setText("Elipse centro Y: ".concat(String.valueOf(CENTER_Y)).concat("px"));
-        ellipseCenterY.setProgress(CENTER_Y);
-        ellipseCenterY.setMax(DEFAULT_CENTER_Y * 2);
-
-        txtEllipseCenterX.setText("Elipse centro X: ".concat(String.valueOf(CENTER_X)).concat("px"));
-        ellipseCenterX.setProgress(CENTER_X);
-        ellipseCenterX.setMax(DEFAULT_CENTER_X * 2);
-
-        ellipseCenterX.setOnSeekBarChangeListener(ellipseCenterXListener);
-        ellipseCenterY.setOnSeekBarChangeListener(ellipseCenterYListener);
-
-        //Tolerance
-        toleranceCenter=findViewById(R.id.tolerance_center);
-        toleranceWidth=findViewById(R.id.tolerance_width);
-
-        toleranceWidth.setProgress(tolerance_width);
-        toleranceWidth.setMax(100);
-
-        toleranceCenter.setProgress(tolerance_center);
-        toleranceCenter.setMax(100);
-
-        toleranceWidth.setOnSeekBarChangeListener(toleranceWidthListener);
-        toleranceCenter.setOnSeekBarChangeListener(toleranceCenterListener);
-
-
-
-
 
     }
 
     /************************************** DEBUG *************************************/
-    private void getAxis() {
-        AXIS_MENOR = sharedPreferences.getFloat(KEY_AXIS_X, 300);
-        AXIS_MAJOR = sharedPreferences.getFloat(KEY_AXIS_Y, 400);
-        CENTER_X = sharedPreferences.getInt(KEY_AXIS_CENTER_X, 0);
-        CENTER_Y = sharedPreferences.getInt(KEY_AXIS_CENTER_Y, 0);
-        touchX = sharedPreferences.getInt(KEY_AXIS_TEMPERATURE_X, 240);
-        touchY = sharedPreferences.getInt(KEY_AXIS_TEMPERATURE_Y, 620);
-        tolerance_center = sharedPreferences.getInt(KEY_TOLERANCE_CENTER, 40);
-        tolerance_width = sharedPreferences.getInt(KEY_TOLERANCE_WIDTH, 50);
-
-    }
-
-    private void SaveAxis(float x, float y, int cx, int cy, int tx, int ty,int tc,int tw) {
-        editor.putFloat(KEY_AXIS_X, x);
-        editor.putFloat(KEY_AXIS_Y, y);
-        editor.putInt(KEY_AXIS_CENTER_X, cx);
-        editor.putInt(KEY_AXIS_CENTER_Y, cy);
-        editor.putInt(KEY_AXIS_TEMPERATURE_X, tx);
-        editor.putInt(KEY_AXIS_TEMPERATURE_Y, ty);
-        editor.putInt(KEY_TOLERANCE_CENTER, tc);
-        editor.putInt(KEY_TOLERANCE_WIDTH, tw);
-        editor.commit();
-    }
-
-    private void defaultAxis() {
-        auxAxisMejor = (int) AXIS_MAJOR;
-        auxAxisMenor = (int) AXIS_MENOR;
-        auxCenterX = CENTER_X;
-        auxCenterY = CENTER_Y;
-        auxTouchX = touchX;
-        auxTouchY = touchY;
-        auxToleranceCenter=tolerance_center;
-        auxToleranceWidth=tolerance_width;
-
-    }
-    //TOLERANCIA
-
-    SeekBar.OnSeekBarChangeListener toleranceCenterListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            tolerance_center=i;
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-
-    SeekBar.OnSeekBarChangeListener toleranceWidthListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            tolerance_width=i;
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-    //ELLIPSE CENTROS
-    SeekBar.OnSeekBarChangeListener ellipseCenterXListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            CENTER_X = i - DEFAULT_CENTER_X;
-            txtEllipseCenterX.setText("Elipse centro X: ".concat(String.valueOf(CENTER_X)).concat("px"));
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-
-    SeekBar.OnSeekBarChangeListener ellipseCenterYListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            CENTER_Y = i - DEFAULT_CENTER_Y;
-            txtEllipseCenterY.setText("Elipse centro Y: ".concat(String.valueOf(CENTER_Y)).concat("px"));
-
-
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-
-
-    //ELLIPSE
-    SeekBar.OnSeekBarChangeListener ellipseXListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            AXIS_MENOR = i;
-            txtEllipseX.setText("Elipse X: ".concat(String.valueOf(i)).concat("px"));
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-
-    SeekBar.OnSeekBarChangeListener ellipseYListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            AXIS_MAJOR = i;
-            txtEllipseY.setText("Elipse Y: ".concat(String.valueOf(i)).concat("px"));
-
-
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_cancel:
                 ToggleView();
-                AXIS_MAJOR = auxAxisMejor;
-                AXIS_MENOR = auxAxisMenor;
-                CENTER_X = auxCenterX;
-                CENTER_Y = auxCenterY;
-                touchX=auxTouchX;
-                touchY=auxTouchY;
-                tolerance_width=auxToleranceWidth;
-                tolerance_center=auxToleranceCenter;
-                txtEllipseX.setText("Elipse X: ".concat(String.valueOf(AXIS_MENOR)).concat("px"));
-                txtEllipseY.setText("Elipse Y: ".concat(String.valueOf(AXIS_MAJOR)).concat("px"));
-                txtEllipseCenterX.setText("Elipse centro X: ".concat(String.valueOf(CENTER_X)).concat("px"));
-                txtEllipseCenterY.setText("Elipse centro Y: ".concat(String.valueOf(CENTER_Y)).concat("px"));
-
-                break;
-            case R.id.btn_save:
-                ToggleView();
-                SaveAxis(AXIS_MENOR, AXIS_MAJOR, CENTER_X, CENTER_Y, touchX, touchY,tolerance_center,tolerance_width);
                 break;
         }
 
