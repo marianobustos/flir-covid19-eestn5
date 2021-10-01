@@ -100,20 +100,16 @@ public class FlirCameraHandler {
 
                 thermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
 
-                double temperature = thermalImage.getValueAt(new Point((int)x,(int)y));
+                double temperature = thermalImage.getValueAt(new Point(touchX,touchY));
                 FaceDetection.temperature= (float) temperature;
                 //System.out.println("FLIR:"+(int)x_point+"x"+(int)y_point+"TEMPERATURE:"+temperature);
                 System.out.println("FLIR:temp:"+(int)touchX+"x"+(int)touchY+"TEMPERATURE:"+temperature);
-                System.out.println("Punto X:" + x);
-                System.out.println("Punto Y:" + y);
+                System.out.println("Punto_OK");
 
 
             }catch (Exception e){
-                System.out.println("Punto X:" + x);
-                System.out.println("Punto Y:" + y);
-                System.out.println("ERROR:" + e);
-                System.out.println("TOUCH: X:" + touchX);
-                System.out.println("TOUCH: Y:" + touchY);
+                System.out.println("Punto_ERROR");
+                System.out.println(e);
             }
             /*Canvas canvas = new Canvas(flirBitmap);
             Paint paint = new Paint();

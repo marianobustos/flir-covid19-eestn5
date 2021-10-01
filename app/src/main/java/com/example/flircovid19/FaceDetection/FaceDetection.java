@@ -21,6 +21,8 @@ import org.tensorflow.lite.support.label.Category;
 import java.io.IOException;
 import java.util.List;
 
+import static com.example.flircovid19.FaceDetection.FaceGraphic.x;
+import static com.example.flircovid19.FaceDetection.FaceGraphic.y;
 import static com.example.flircovid19.MainActivity.debug;
 import static com.example.flircovid19.MainActivity.touchX;
 import static com.example.flircovid19.MainActivity.touchY;
@@ -146,8 +148,18 @@ public class FaceDetection {
         float x = face.getBoundingBox().centerX();
         float y = face.getBoundingBox().centerY()-face.getBoundingBox().height()/4;
         // Actualizo punto de lectura
-        touchX=(int)x;
-        touchY=(int)y;
+        // Luego de aplicar la transformación de escala y desplazamiento
+        // delta x tablet 630 (1210 ----> 580)
+        // delta y flir -453 (553 ----> 100)
+
+        touchY = (int)((x -1210) * 453 / 630 + 553);
+        // delta y tablet 32 (479 ---> 511)
+        // delta x FLIR -22 (331 ---> 309)
+        touchX = (int)((y - 479) * (-22) / 32 + 331);
+        System.out.println("Punto_Tablet X:" + x);
+        System.out.println("Punto_Tablet Y:" + y);
+        System.out.println("Punto_FLIR X:" + touchX);
+        System.out.println("Punto_FLIR Y:" + touchY);
         x_face = x;
         y_face = y;
         System.out.println("detected:" + x_face+"x"+y_face+"---->"+center_x+"x"+center_y);
